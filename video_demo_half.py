@@ -15,7 +15,7 @@ import argparse
 
 
 def get_test_input(input_dim, CUDA):
-    img = cv2.imread("dog-cycle-car.png")
+    img = cv2.imread("DrivingRec.png")#("dog-cycle-car.png")
     img = cv2.resize(img, (input_dim, input_dim)) 
     img_ =  img[:,:,::-1].transpose((2,0,1))
     img_ = img_[np.newaxis,:,:,:]/255.0
@@ -47,11 +47,14 @@ def write(x, img):
     cls = int(x[-1])
     label = "{0}".format(classes[cls])
     color = random.choice(colors)
-    cv2.rectangle(img, c1, c2,color, 1)
+    #cv2.rectangle(img, c1, c2,color, 1)
+    cv2.rectangle(img, (int(c1[0]), int(c1[1])), (int(c2[0]), int(c2[1])), color, 1)
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-    cv2.rectangle(img, c1, c2,color, -1)
-    cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
+    #cv2.rectangle(img, c1, c2,color, -1)
+    cv2.rectangle(img, (int(c1[0]), int(c1[1])), (int(c2[0]), int(c2[1])), color, -1)
+    #cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
+    cv2.putText(img, label, (int(c1[0]), int(c1[1]) + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1);
     return img
 
 def arg_parse():
@@ -65,7 +68,8 @@ def arg_parse():
    
     parser.add_argument("--video", dest = 'video', help = 
                         "Video to run detection upon",
-                        default = "video.avi", type = str)
+                        default="Driving.mov", type=str)
+                        #default = "video.avi", type = str)
     parser.add_argument("--dataset", dest = "dataset", help = "Dataset on which the network has been trained", default = "pascal")
     parser.add_argument("--confidence", dest = "confidence", help = "Object Confidence to filter predictions", default = 0.5)
     parser.add_argument("--nms_thresh", dest = "nms_thresh", help = "NMS Threshhold", default = 0.4)
@@ -113,7 +117,7 @@ if __name__ == '__main__':
 
     model.eval()
     
-    videofile = 'video.avi'
+    videofile = 'Driving.mov'#'video.avi'
     
     cap = cv2.VideoCapture(videofile)
     
