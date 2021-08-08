@@ -41,15 +41,13 @@ def prep_image(img, inp_dim):
     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
     return img_, orig_im, dim
 
-def write(x, img, counter):
+def write(x, img):
     c1 = tuple(x[1:3].int())
     c2 = tuple(x[3:5].int())
     cls = int(x[-1])
     label = "{0}".format(classes[cls])
     color = random.choice(colors)
-    counter += 1
 
-    print(img.shape)
    #cv2.rectangle(img, c1, c2,color, 1)
     cv2.rectangle(img, (int(c1[0]), int(c1[1])), (int(c2[0]), int(c2[1])), color, 1)
     #バウンディングボックス
@@ -60,8 +58,9 @@ def write(x, img, counter):
     deltaX = abs(int(c1[0]) - int(c2[0]))
     deltaY = abs(int(c1[1]) - int(c2[1]))
 
-    print(label, "X1",int(c1[0]),"Y1",int(c1[1]),"X2",int(c2[0]),"Y2",int(c2[1]))
-    print(label, "中心からの距離(X)：",(delta_centerX**2)/1000,"中心からの距離(Y)：",(delta_centerY**2)/1000,"矩形サイズ",(deltaX**2+deltaY**2)/1000)
+    #print(str(counter)+")"+label, "X1",int(c1[0]),"Y1",int(c1[1]),"X2",int(c2[0]),"Y2",int(c2[1]))
+    if cls in [0,1,2,3,5,7]:
+        print(str(counter)+")"+label, "中心からの距離(X)：",int((delta_centerX**2)/1000),"中心からの距離(Y)：",int((delta_centerY**2)/1000),"矩形サイズ",int((deltaX**2+deltaY**2)/1000))
 
     #テキストのサイズ
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
@@ -71,7 +70,7 @@ def write(x, img, counter):
     #cv2.rectangle(img, c1, c2,color, -1)
     cv2.rectangle(img, (int(c1[0]), int(c1[1])), (int(c2[0]), int(c2[1])), color, -1)
     #cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
-    cv2.putText(img, label+str(counter), (int(c1[0]), int(c1[1]) + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1);
+    cv2.putText(img, str(counter)+")"+label, (int(c1[0]), int(c1[1]) + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225, 255, 255], 1);
     return img
 
 def arg_parse():
@@ -191,9 +190,12 @@ if __name__ == '__main__':
             classes = load_classes('data/coco.names')
             colors = pkl.load(open("pallete", "rb"))
 
-            counter += 1
-            list(map(lambda x: write(x, orig_im, counter), output))
-            
+            print("検出物体数",output.shape[0])
+
+            #list(map(lambda x: write(x, orig_im), output))
+            for object in output:
+                counter += 1
+                write(object, orig_im)
             
             cv2.imshow("frame", orig_im)
             key = cv2.waitKey(1)
