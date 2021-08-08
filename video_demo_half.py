@@ -52,20 +52,16 @@ def write(x, img, counter):
     print(img.shape)
    #cv2.rectangle(img, c1, c2,color, 1)
     cv2.rectangle(img, (int(c1[0]), int(c1[1])), (int(c2[0]), int(c2[1])), color, 1)
-    #Imgの中心
-    IMGcenterX = img.shape[0] * 0.5
-    IMGcenterY = img.shape[1] * 0.5
     #バウンディングボックス
     centerX = (int(c1[0])+int(c2[0]))*0.5
     centerY = (int(c1[1])+int(c2[1]))*0.5
-    delta_centerX = abs(img.shape[1] - centerX)
-    delta_centerY = abs(img.shape[0] - centerY)
+    delta_centerX = abs((img.shape[1])*0.5 - centerX)
+    delta_centerY = abs((img.shape[0])*0.5 - centerY)
     deltaX = abs(int(c1[0]) - int(c2[0]))
     deltaY = abs(int(c1[1]) - int(c2[1]))
 
-
-
-    print(label + str(counter), "中心からの距離：",(delta_centerX**2)/1000,"矩形サイズ",(deltaX**2+deltaY**2)/1000)
+    print(label, "X1",int(c1[0]),"Y1",int(c1[1]),"X2",int(c2[0]),"Y2",int(c2[1]))
+    print(label, "中心からの距離(X)：",(delta_centerX**2)/1000,"中心からの距離(Y)：",(delta_centerY**2)/1000,"矩形サイズ",(deltaX**2+deltaY**2)/1000)
 
     #テキストのサイズ
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
