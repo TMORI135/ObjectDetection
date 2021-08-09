@@ -133,8 +133,11 @@ if __name__ == '__main__':
     model(get_test_input(inp_dim, CUDA), CUDA)
 
     model.eval()
-    
-    videofile = 'DrivingRec.png'#'video.avi'
+
+
+    videofile = "Driving2.mov"
+    #videofile = 'DrivingRec.png'
+    #videofile = 'video.avi'
     
     cap = cv2.VideoCapture(videofile)
     
