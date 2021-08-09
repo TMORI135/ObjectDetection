@@ -135,7 +135,8 @@ if __name__ == '__main__':
     model.eval()
 
 
-    videofile = "Driving2.mov"
+    #videofile = "Driving2.mov"
+    videofile = "Driving_cyc.mov"
     #videofile = 'DrivingRec.png'
     #videofile = 'video.avi'
     
