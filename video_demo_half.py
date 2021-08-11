@@ -12,6 +12,7 @@ import pandas as pd
 import random 
 import pickle as pkl
 import argparse
+import pandas as pd
 
 
 def get_test_input(input_dim, CUDA):
@@ -209,6 +210,7 @@ if __name__ == '__main__':
             for object in output:
                 counter += 1
                 write(object, orig_im)
+
             csv_output.append(csv_output_tmp)
             print(csv_output)
             counter = 0
@@ -216,6 +218,11 @@ if __name__ == '__main__':
             cv2.imshow("frame", orig_im)
             key = cv2.waitKey(1)
             if key & 0xFF == ord('q'):
+                Coulum = ['id', 'name', 'sex']
+                # データフレームを作成
+                df = pd.DataFrame(csv_output, columns=Coulum)
+                # CSV ファイル出力
+                df.to_csv("Output.csv")
                 break
             frames += 1
             print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
@@ -224,6 +231,11 @@ if __name__ == '__main__':
         else:
             #break
             if key & 0xFF == ord('q'):
+                Coulum = ['id', 'name', 'sex']
+                # データフレームを作成
+                df = pd.DataFrame(csv_output, columns=Coulum)
+                # CSV ファイル出力
+                df.to_csv("YOLO_Output.csv")
                 break
     
 
