@@ -59,8 +59,15 @@ def write(x, img):
     deltaY = abs(int(c1[1]) - int(c2[1]))
 
     #print(str(counter)+")"+label, "X1",int(c1[0]),"Y1",int(c1[1]),"X2",int(c2[0]),"Y2",int(c2[1]))
-    if cls in [0,1,2,3,5,7]:
-        print(str(counter)+")"+label, "中心からの距離(X)：",int((delta_centerX**2)/1000),"中心からの距離(Y)：",int((delta_centerY**2)/1000),"矩形サイズ",int((deltaX**2+deltaY**2)/1000))
+    #if cls in [0,1,2,3,5,7]:
+    #    print(str(counter)+")"+label, "中心からの距離(X)：",int((delta_centerX**2)/100),"中心からの距離(Y)：",int((delta_centerY**2)/100),"矩形サイズ",int((deltaX**2+deltaY**2)/100))
+
+    csv_output_tmp[counter-1][0] = frames #何フレーム目か
+    csv_output_tmp[counter-1][1] = counter #同フレーム内の物標ナンバー
+    csv_output_tmp[counter-1][2] = label #物標種別
+    csv_output_tmp[counter-1][3] = int((delta_centerX**2)/100) #水平方向の画像中心〜物標中心の距離
+    csv_output_tmp[counter-1][4] = int((delta_centerY**2)/100) #垂直方向の画像中心〜物標中心の距離
+    csv_output_tmp[counter-1][5] = int((deltaX**2+deltaY**2)/100) #ボックスの大きさ
 
     #テキストのサイズ
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
@@ -107,12 +114,11 @@ if __name__ == '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
     counter = 0
+    csv_output = []
 
+    #GPUが使えるか確認
     CUDA = torch.cuda.is_available()
 
-        
-
-    CUDA = torch.cuda.is_available()
     num_classes = 80 
     bbox_attrs = 5 + num_classes
     
@@ -167,7 +173,6 @@ if __name__ == '__main__':
             output = model(Variable(img, volatile = True), CUDA)
             output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
 
-           
             if type(output) == int:
                 frames += 1
                 print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
@@ -185,8 +190,9 @@ if __name__ == '__main__':
             output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim[:,1].view(-1,1))/2
             
             output[:,1:5] /= scaling_factor
-    
+
             for i in range(output.shape[0]):
+                #値をclampしている。最小0、最大im_dim[i,*]
                 output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
                 output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
             
@@ -196,11 +202,17 @@ if __name__ == '__main__':
 
             print("検出物体数",output.shape[0])
 
+            #csv出力用リストの初期化
+            csv_output_tmp = [[0,0, "none", 0, 0,0] for i in range(len(output))]
+
             #list(map(lambda x: write(x, orig_im), output))
             for object in output:
                 counter += 1
                 write(object, orig_im)
-            
+            csv_output.append(csv_output_tmp)
+            print(csv_output)
+            counter = 0
+
             cv2.imshow("frame", orig_im)
             key = cv2.waitKey(1)
             if key & 0xFF == ord('q'):
