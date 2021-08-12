@@ -63,13 +63,14 @@ def write(x, img):
     #if cls in [0,1,2,3,5,7]:
     #    print(str(counter)+")"+label, "中心からの距離(X)：",int((delta_centerX**2)/100),"中心からの距離(Y)：",int((delta_centerY**2)/100),"矩形サイズ",int((deltaX**2+deltaY**2)/100))
 
-    csv_output_tmp[counter-1][0] = frames #何フレーム目か
-    csv_output_tmp[counter-1][1] = counter #同フレーム内の物標ナンバー
-    csv_output_tmp[counter-1][2] = label #物標種別
-    csv_output_tmp[counter-1][3] = int((delta_centerX**2)/100) #水平方向の画像中心〜物標中心の距離
-    csv_output_tmp[counter-1][4] = int((delta_centerY**2)/100) #垂直方向の画像中心〜物標中心の距離
-    csv_output_tmp[counter-1][5] = int((deltaX**2+deltaY**2)/100) #ボックスの大きさ
+    csv_output_tmp[0] = frames #何フレーム目か
+    csv_output_tmp[1] = counter #同フレーム内の物標ナンバー
+    csv_output_tmp[2] = cls #物標種別
+    csv_output_tmp[3] = int((delta_centerX**2)/100) #水平方向の画像中心〜物標中心の距離
+    csv_output_tmp[4] = int((delta_centerY**2)/100) #垂直方向の画像中心〜物標中心の距離
+    csv_output_tmp[5] = int((deltaX**2+deltaY**2)/100) #ボックスの大きさ
 
+    csv_output.append(csv_output_tmp.copy())
     #テキストのサイズ
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
@@ -204,25 +205,28 @@ if __name__ == '__main__':
             print("検出物体数",output.shape[0])
 
             #csv出力用リストの初期化
-            csv_output_tmp = [[0,0, "none", 0, 0,0] for i in range(len(output))]
+            #csv_output_tmp = [[0,0, "none", 0, 0,0] for i in range(len(output))]
+            csv_output_tmp = [0 for i in range(6)]
 
             #list(map(lambda x: write(x, orig_im), output))
             for object in output:
                 counter += 1
                 write(object, orig_im)
 
-            csv_output.append(csv_output_tmp)
+            #csv_output.append(csv_output_tmp)
             print(csv_output)
             counter = 0
-
-            cv2.imshow("frame", orig_im)
-            key = cv2.waitKey(1)
-            if key & 0xFF == ord('q'):
-                Coulum = ['id', 'name', 'sex']
+            if frames > 5:
+                Coulum = ['Frame', 'Object No','Object Type', 'DeltaX', 'DeltaY', "Size"]
                 # データフレームを作成
                 df = pd.DataFrame(csv_output, columns=Coulum)
                 # CSV ファイル出力
                 df.to_csv("Output.csv")
+                break
+
+            cv2.imshow("frame", orig_im)
+            key = cv2.waitKey(1)
+            if key & 0xFF == ord('q'):
                 break
             frames += 1
             print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
@@ -231,11 +235,6 @@ if __name__ == '__main__':
         else:
             #break
             if key & 0xFF == ord('q'):
-                Coulum = ['id', 'name', 'sex']
-                # データフレームを作成
-                df = pd.DataFrame(csv_output, columns=Coulum)
-                # CSV ファイル出力
-                df.to_csv("YOLO_Output.csv")
                 break
     
 
