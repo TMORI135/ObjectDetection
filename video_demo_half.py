@@ -61,7 +61,7 @@ def write(x, img):
 
     #print(str(counter)+")"+label, "X1",int(c1[0]),"Y1",int(c1[1]),"X2",int(c2[0]),"Y2",int(c2[1]))
     #if cls in [0,1,2,3,5,7]:
-    #    print(str(counter)+")"+label, "中心からの距離(X)：",int((delta_centerX**2)/100),"中心からの距離(Y)：",int((delta_centerY**2)/100),"矩形サイズ",int((deltaX**2+deltaY**2)/100))
+    print(str(counter)+")"+label, "中心からの距離(X)：",int(delta_centerX),"中心からの距離(Y)：",int(delta_centerY),"矩形サイズ",int((deltaX**2+deltaY**2)/100))
 
     csv_output_tmp[0] = frames #何フレーム目か
     csv_output_tmp[1] = counter #同フレーム内の物標ナンバー
